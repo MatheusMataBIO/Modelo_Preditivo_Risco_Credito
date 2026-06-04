@@ -48,21 +48,17 @@ pagina = st.sidebar.radio(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    "**Modelo:** LightGBM + Isotonic Calibration
+st.sidebar.markdown("""
+**Modelo:** LightGBM + Isotonic Calibration
 
-"
-    "**AUC-ROC:** 0.9444
+**AUC-ROC:** 0.9444
 
-"
-    "**Gini:** 0.8888
+**Gini:** 0.8888
 
-"
-    "**KS:** 0.7573
+**KS:** 0.7573
 
-"
-    "**Brier:** 0.0362"
-)
+**Brier:** 0.0362
+""")
 
 # ── Funções auxiliares ────────────────────────────────────────
 FAIXAS = [
