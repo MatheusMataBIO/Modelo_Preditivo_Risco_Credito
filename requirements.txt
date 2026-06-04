@@ -5,4 +5,5 @@ pandas
 numpy
 shap
 matplotlib
+joblib
 optuna
