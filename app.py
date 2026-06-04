@@ -340,11 +340,10 @@ if pagina == "💳 Previsão Individual":
 
         with col_acao:
             st.markdown("**Ação Recomendada**")
-            st.info(f"**{acao}**
-
-{detalhe}")
-
-        # Indicador de confiança
+            mensagem = f"**{acao}**\n\n{detalhe}"
+            st.info(mensagem)
+        
+      # Indicador de confiança
         st.markdown("---")
         if n_cobr == 0:
             st.warning(
