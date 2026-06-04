@@ -26,13 +26,13 @@ st.set_page_config(
 # ── Carregar artefatos ────────────────────────────────────────
 @st.cache_resource
 def carregar_artefatos():
-    modelo     = joblib.load("/content/modelo_final.pkl")
-    encoders   = joblib.load("/content/encoders.pkl")
-    params     = joblib.load("/content/params_imputacao.pkl")
-    validacao  = joblib.load("/content/dados_validacao.pkl")
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    modelo    = joblib.load(os.path.join(base_path, "artefatos", "modelo_final.pkl"))
+    encoders  = joblib.load(os.path.join(base_path, "artefatos", "encoders.pkl"))
+    params    = joblib.load(os.path.join(base_path, "artefatos", "params_imputacao.pkl"))
+    validacao = joblib.load(os.path.join(base_path, "artefatos", "dados_validacao.pkl"))
     return modelo, encoders, params, validacao
-
-modelo, encoders, params, validacao = carregar_artefatos()
 
 # ── Sidebar ───────────────────────────────────────────────────
 st.sidebar.image(
