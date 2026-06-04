@@ -141,10 +141,10 @@ def preparar_features(inputs, params, encoders):
     d["FLAG_PORTE_NULO"]  = 1 if d["PORTE"] is None else 0
 
     # VALOR_A_PAGAR
-    val = d["VALOR_A_PAGAR"] or params["mediana_valor"]
-    d["FLAG_VALOR_BAIXO"] = 1 if val < params["p10_valor"] else 0
-    d["VALOR_A_PAGAR"]    = min(val, params["p99_valor"])
-
+    valor_pagar = d["VALOR_A_PAGAR"] if d["VALOR_A_PAGAR"] else params["mediana_valor"]
+    d["FLAG_VALOR_BAIXO"] = 1 if valor_pagar < params["p10_valor"] else 0
+    d["VALOR_A_PAGAR"]    = min(valor_pagar, params["p99_valor"])
+   
     # FLAG_PF
     d["FLAG_PF"] = 1 if d.get("FLAG_PF_INPUT") == "Pessoa Física" else 0
 
@@ -197,10 +197,10 @@ def preparar_features(inputs, params, encoders):
                    "DOMINIO_EMAIL", "ESTADO_DDD", "REGIAO_CEP"]
     for col in categoricas:
         le = encoders[col]
-        val_col = str(d[col])
-        if val_col not in le.classes_:
-            val_col = "DESCONHECIDO"
-        d[col] = int(le.transform([val_col])[0])
+        valor_col = str(d[col])
+        if valor_col not in le.classes_:
+          valor_col = "DESCONHECIDO"
+        d[col] = int(le.transform([valor_col])[0])
 
     # Montar DataFrame na ordem correta
     FEATURES = [
