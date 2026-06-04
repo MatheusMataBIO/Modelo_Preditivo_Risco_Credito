@@ -1,8 +1,8 @@
-
 # ============================================================
 # app.py — Previsão de Inadimplência | Datarisk
 # ============================================================
 
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -27,12 +27,14 @@ st.set_page_config(
 @st.cache_resource
 def carregar_artefatos():
     base_path = os.path.dirname(os.path.abspath(__file__))
-    
     modelo    = joblib.load(os.path.join(base_path, "artefatos", "modelo_final.pkl"))
     encoders  = joblib.load(os.path.join(base_path, "artefatos", "encoders.pkl"))
     params    = joblib.load(os.path.join(base_path, "artefatos", "params_imputacao.pkl"))
     validacao = joblib.load(os.path.join(base_path, "artefatos", "dados_validacao.pkl"))
     return modelo, encoders, params, validacao
+
+# Expor no escopo global
+modelo, encoders, params, validacao = carregar_artefatos()
 
 # ── Sidebar ───────────────────────────────────────────────────
 st.sidebar.image(
@@ -144,7 +146,7 @@ def preparar_features(inputs, params, encoders):
     valor_pagar = d["VALOR_A_PAGAR"] if d["VALOR_A_PAGAR"] else params["mediana_valor"]
     d["FLAG_VALOR_BAIXO"] = 1 if valor_pagar < params["p10_valor"] else 0
     d["VALOR_A_PAGAR"]    = min(valor_pagar, params["p99_valor"])
-   
+
     # FLAG_PF
     d["FLAG_PF"] = 1 if d.get("FLAG_PF_INPUT") == "Pessoa Física" else 0
 
@@ -185,11 +187,11 @@ def preparar_features(inputs, params, encoders):
 
     # Features temporais
     prazo = (d["DATA_VENCIMENTO"] - d["DATA_EMISSAO"]).days
-    d["PRAZO_COBRANCA"]   = prazo
-    d["MES_VENCIMENTO"]   = d["DATA_VENCIMENTO"].month
+    d["PRAZO_COBRANCA"]    = prazo
+    d["MES_VENCIMENTO"]    = d["DATA_VENCIMENTO"].month
     ant = (d["SAFRA_REF"] - d["DATA_CADASTRO"]).days
     ant = ant if ant >= 0 else params["med_ant"]
-    d["ANTIGUIDADE_DIAS"] = ant
+    d["ANTIGUIDADE_DIAS"]  = ant
     d["FLAG_CLIENTE_NOVO"] = 1 if ant < 180 else 0
 
     # Encoding categóricas
@@ -199,7 +201,7 @@ def preparar_features(inputs, params, encoders):
         le = encoders[col]
         valor_col = str(d[col])
         if valor_col not in le.classes_:
-          valor_col = "DESCONHECIDO"
+            valor_col = "DESCONHECIDO"
         d[col] = int(le.transform([valor_col])[0])
 
     # Montar DataFrame na ordem correta
@@ -230,10 +232,10 @@ if pagina == "💳 Previsão Individual":
 
         with col1:
             st.subheader("📋 Dados da Cobrança")
-            valor       = st.number_input(
+            valor        = st.number_input(
                 "Valor a Pagar (R$)", min_value=0.0,
                 value=30000.0, step=1000.0)
-            taxa        = st.number_input(
+            taxa         = st.number_input(
                 "Taxa de Juros (%)", min_value=0.0,
                 max_value=20.0, value=6.99, step=0.01)
             data_emissao = st.date_input(
@@ -264,23 +266,23 @@ if pagina == "💳 Previsão Individual":
 
         with col3:
             st.subheader("📍 Localização e Financeiro")
-            ddd         = st.number_input(
+            ddd      = st.number_input(
                 "DDD", min_value=11, max_value=99, value=11)
-            cep_2dig    = st.number_input(
+            cep_2dig = st.number_input(
                 "CEP (2 primeiros dígitos)",
                 min_value=1, max_value=99, value=13)
-            renda       = st.number_input(
+            renda    = st.number_input(
                 "Renda/Faturamento Mês Anterior (R$)",
                 min_value=0.0, value=250000.0, step=10000.0)
-            n_func      = st.number_input(
+            n_func   = st.number_input(
                 "Nº de Funcionários",
                 min_value=0, value=100, step=10)
 
             st.subheader("📈 Histórico de Pagamentos")
-            n_cobr      = st.number_input(
+            n_cobr       = st.number_input(
                 "Nº de Cobranças Anteriores",
                 min_value=0, value=10, step=1)
-            taxa_hist   = st.slider(
+            taxa_hist    = st.slider(
                 "Taxa Histórica de Inadimplência",
                 0.0, 1.0, 0.05, step=0.01)
             media_atraso = st.number_input(
@@ -293,46 +295,43 @@ if pagina == "💳 Previsão Individual":
 
     if submitted:
         inputs = {
-            "VALOR_A_PAGAR":       valor,
-            "TAXA":                taxa,
-            "DATA_EMISSAO":        pd.Timestamp(data_emissao),
-            "DATA_VENCIMENTO":     pd.Timestamp(data_venc),
-            "SAFRA_REF":           pd.Timestamp(safra_ref),
-            "DATA_CADASTRO":       pd.Timestamp(data_cadastro),
-            "PORTE":               porte,
-            "SEGMENTO_INDUSTRIAL": segmento,
-            "FLAG_PF_INPUT":       tipo_pessoa,
-            "DOMINIO_EMAIL":       email,
-            "DDD":                 ddd,
-            "CEP_2_DIG":           cep_2dig,
-            "RENDA_MES_ANTERIOR":  renda,
-            "NO_FUNCIONARIOS":     n_func,
-            "N_COBR_HISTORICO":    n_cobr,
-            "TAXA_INAD_HISTORICA": taxa_hist,
+            "VALOR_A_PAGAR":        valor,
+            "TAXA":                 taxa,
+            "DATA_EMISSAO":         pd.Timestamp(data_emissao),
+            "DATA_VENCIMENTO":      pd.Timestamp(data_venc),
+            "SAFRA_REF":            pd.Timestamp(safra_ref),
+            "DATA_CADASTRO":        pd.Timestamp(data_cadastro),
+            "PORTE":                porte,
+            "SEGMENTO_INDUSTRIAL":  segmento,
+            "FLAG_PF_INPUT":        tipo_pessoa,
+            "DOMINIO_EMAIL":        email,
+            "DDD":                  ddd,
+            "CEP_2_DIG":            cep_2dig,
+            "RENDA_MES_ANTERIOR":   renda,
+            "NO_FUNCIONARIOS":      n_func,
+            "N_COBR_HISTORICO":     n_cobr,
+            "TAXA_INAD_HISTORICA":  taxa_hist,
             "FLAG_JA_INADIMPLENTE": 1 if taxa_hist > 0 else 0,
-            "MEDIA_DIAS_ATRASO":   media_atraso,
+            "MEDIA_DIAS_ATRASO":    media_atraso,
         }
 
         X = preparar_features(inputs, params, encoders)
         prob = float(modelo.predict_proba(X)[0][1])
-        faixa, cor, acao, detalhe, prioridade =             classificar_risco(prob)
+        faixa, cor, acao, detalhe, prioridade = classificar_risco(prob)
 
         st.markdown("---")
         st.subheader("📊 Resultado da Previsão")
 
-        # Probabilidade em destaque
         col_prob, col_faixa, col_acao = st.columns(3)
 
         with col_prob:
             st.metric(
                 label="Probabilidade de Inadimplência",
-                value=f"{prob:.1%}"
-            )
-            # Gauge simples com barra de progresso
+                value=f"{prob:.1%}")
             st.progress(prob)
 
         with col_faixa:
-            st.markdown(f"**Faixa de Risco**")
+            st.markdown("**Faixa de Risco**")
             st.markdown(
                 f"<h2 style='color:{cor}'>{faixa}</h2>",
                 unsafe_allow_html=True)
@@ -342,8 +341,8 @@ if pagina == "💳 Previsão Individual":
             st.markdown("**Ação Recomendada**")
             mensagem = f"**{acao}**\n\n{detalhe}"
             st.info(mensagem)
-        
-      # Indicador de confiança
+
+        # Indicador de confiança
         st.markdown("---")
         if n_cobr == 0:
             st.warning(
@@ -364,7 +363,6 @@ if pagina == "💳 Previsão Individual":
         st.subheader("🔍 Principais Fatores da Previsão")
 
         try:
-            # Extrair modelo base do calibrador
             modelo_base = modelo.estimator
             explainer   = shap.TreeExplainer(modelo_base)
             shap_vals   = explainer.shap_values(X)
@@ -374,18 +372,16 @@ if pagina == "💳 Previsão Individual":
             else:
                 sv = shap_vals[0]
 
-            FEATURES = list(X.columns)
-            shap_df  = pd.DataFrame({
-                "feature": FEATURES,
+            FEATURES_LIST = list(X.columns)
+            shap_df = pd.DataFrame({
+                "feature": FEATURES_LIST,
                 "shap":    sv
-            }).reindex(
-                pd.Series(sv).abs().sort_values(
-                    ascending=False).index
-            ).head(3)
+            }).iloc[pd.Series(sv).abs().sort_values(
+                ascending=False).index].head(3)
 
             for _, row in shap_df.iterrows():
-                direcao = "aumenta" if row["shap"] > 0                           else "diminui"
-                cor_dir = "#DC2626" if row["shap"] > 0                           else "#16A34A"
+                direcao = "aumenta" if row["shap"] > 0 else "diminui"
+                cor_dir = "#DC2626" if row["shap"] > 0 else "#16A34A"
                 st.markdown(
                     f"<span style='color:{cor_dir}'>●</span> "
                     f"**{row['feature']}** {direcao} o risco "
@@ -403,24 +399,22 @@ elif pagina == "📊 Performance do Modelo":
                 "validação em jan–jun/2021.")
     st.markdown("---")
 
-    # Cards de métricas
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("AUC-ROC",    "0.9444", "↑ excelente")
-    c2.metric("Gini",       "0.8888", "↑ excelente")
-    c3.metric("KS",         "0.7573", "↑ excelente")
-    c4.metric("Brier Score","0.0362", "↓ bem calibrado")
+    c1.metric("AUC-ROC",     "0.9444", "↑ excelente")
+    c2.metric("Gini",        "0.8888", "↑ excelente")
+    c3.metric("KS",          "0.7573", "↑ excelente")
+    c4.metric("Brier Score", "0.0362", "↓ bem calibrado")
 
     st.markdown("---")
 
-    # Curva ROC
     col_roc, col_cm = st.columns(2)
 
     with col_roc:
         st.subheader("Curva ROC")
-        y_val   = np.array(validacao["y_val"])
-        y_prob  = np.array(validacao["prob_final"])
-        auc     = roc_auc_score(y_val, y_prob)
-        fpr, tpr, _ = roc_curve(y_val, y_prob)
+        y_val_arr  = np.array(validacao["y_val"])
+        y_prob_arr = np.array(validacao["prob_final"])
+        auc        = roc_auc_score(y_val_arr, y_prob_arr)
+        fpr, tpr, _ = roc_curve(y_val_arr, y_prob_arr)
 
         fig, ax = plt.subplots(figsize=(6, 5))
         ax.plot(fpr, tpr, color="#1E2761", linewidth=2,
@@ -437,7 +431,6 @@ elif pagina == "📊 Performance do Modelo":
         st.pyplot(fig)
         plt.close()
 
-    # Threshold dinâmico + matriz de confusão
     with col_cm:
         st.subheader("Threshold Dinâmico")
         threshold = st.slider(
@@ -446,46 +439,33 @@ elif pagina == "📊 Performance do Modelo":
             value=0.2389, step=0.01,
             help="Mova para ver o impacto nas métricas")
 
-        y_pred = (y_prob >= threshold).astype(int)
-        cm     = confusion_matrix(y_val, y_pred)
-        prec   = precision_score(y_val, y_pred,
-                                  zero_division=0)
-        rec    = recall_score(y_val, y_pred,
-                               zero_division=0)
-        f1     = f1_score(y_val, y_pred,
-                          zero_division=0)
+        y_pred = (y_prob_arr >= threshold).astype(int)
+        cm     = confusion_matrix(y_val_arr, y_pred)
+        prec   = precision_score(y_val_arr, y_pred, zero_division=0)
+        rec    = recall_score(y_val_arr, y_pred, zero_division=0)
+        f1     = f1_score(y_val_arr, y_pred, zero_division=0)
 
-        # Métricas do threshold
         m1, m2, m3 = st.columns(3)
         m1.metric("Precisão", f"{prec:.1%}")
         m2.metric("Recall",   f"{rec:.1%}")
         m3.metric("F1-Score", f"{f1:.3f}")
 
-        # Matriz de confusão
         fig2, ax2 = plt.subplots(figsize=(5, 4))
-        cores_cm = np.array([
-            ["#16A34A", "#EA580C"],
-            ["#DC2626", "#16A34A"]
-        ])
+        cores_cm = [["#16A34A", "#EA580C"],
+                    ["#DC2626", "#16A34A"]]
+        labels_cm = [["VN", "FP"], ["FN", "VP"]]
         for i in range(2):
             for j in range(2):
-                ax2.add_patch(
-                    mpatches.Rectangle(
-                        (j, 1-i), 1, 1,
-                        color=cores_cm[i][j],
-                        alpha=0.8))
-                ax2.text(
-                    j + 0.5, 1.5 - i,
-                    f"{cm[i][j]:,}",
-                    ha="center", va="center",
-                    fontsize=14, fontweight="bold",
-                    color="white")
-                labels = [["VN", "FP"], ["FN", "VP"]]
-                ax2.text(
-                    j + 0.5, 1.2 - i,
-                    labels[i][j],
-                    ha="center", va="center",
-                    fontsize=10, color="white")
+                ax2.add_patch(mpatches.Rectangle(
+                    (j, 1-i), 1, 1,
+                    color=cores_cm[i][j], alpha=0.8))
+                ax2.text(j+0.5, 1.5-i, f"{cm[i][j]:,}",
+                         ha="center", va="center",
+                         fontsize=14, fontweight="bold",
+                         color="white")
+                ax2.text(j+0.5, 1.2-i, labels_cm[i][j],
+                         ha="center", va="center",
+                         fontsize=10, color="white")
 
         ax2.set_xlim(0, 2)
         ax2.set_ylim(0, 2)
@@ -500,7 +480,6 @@ elif pagina == "📊 Performance do Modelo":
         st.pyplot(fig2)
         plt.close()
 
-    # Interpretação do threshold
     st.markdown("---")
     st.info(
         f"**Threshold atual: {threshold:.4f}** — "
@@ -508,7 +487,8 @@ elif pagina == "📊 Performance do Modelo":
         f"**{cm[1][1]:,} detectados ({rec:.1%} de recall)** "
         f"e {cm[1][0]:,} não detectados. "
         f"De {cm[0][0]+cm[0][1]:,} adimplentes, "
-        f"**{cm[0][1]:,} falsos alarmes ({cm[0][1]/(cm[0][0]+cm[0][1]):.1%})**."
+        f"**{cm[0][1]:,} falsos alarmes "
+        f"({cm[0][1]/(cm[0][0]+cm[0][1]):.1%})**."
     )
 
 # ═══════════════════════════════════════════════════════════════
@@ -551,7 +531,6 @@ elif pagina == "ℹ️ Sobre o Projeto":
         ("8. Submissão",
          "11.542 previsões geradas para a base de teste"),
     ]
-
     for titulo, desc in etapas:
         st.markdown(f"**{titulo}** — {desc}")
 
@@ -563,8 +542,7 @@ elif pagina == "ℹ️ Sobre o Projeto":
         ],
         "Cobrança Atual": [
             "VALOR_A_PAGAR", "TAXA", "PRAZO_COBRANCA",
-            "MES_VENCIMENTO", "FLAG_VALOR_BAIXO",
-            "FLAG_VALOR_NULO"
+            "MES_VENCIMENTO", "FLAG_VALOR_BAIXO", "FLAG_VALOR_NULO"
         ],
         "Perfil Cadastral": [
             "PORTE", "FLAG_PORTE_NULO", "SEGMENTO_INDUSTRIAL",
@@ -573,8 +551,7 @@ elif pagina == "ℹ️ Sobre o Projeto":
             "FLAG_CLIENTE_NOVO"
         ],
         "Comportamento Mensal": [
-            "RENDA_MES_ANTERIOR", "NO_FUNCIONARIOS",
-            "FLAG_FUNC_NULO"
+            "RENDA_MES_ANTERIOR", "NO_FUNCIONARIOS", "FLAG_FUNC_NULO"
         ],
     }
 
@@ -587,8 +564,8 @@ elif pagina == "ℹ️ Sobre o Projeto":
 
     st.subheader("Referências")
     st.markdown("""
-    - Ke et al. (2017). LightGBM. NeurIPS.
-    - Lundberg & Lee (2017). SHAP. NeurIPS.
-    - Akiba et al. (2019). Optuna. KDD.
-    - Siddiqi (2012). Credit Risk Scorecards. Wiley.
+- Ke et al. (2017). LightGBM. NeurIPS.
+- Lundberg & Lee (2017). SHAP. NeurIPS.
+- Akiba et al. (2019). Optuna. KDD.
+- Siddiqi (2012). Credit Risk Scorecards. Wiley.
 """)
