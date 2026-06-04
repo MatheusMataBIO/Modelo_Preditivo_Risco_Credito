@@ -586,12 +586,9 @@ elif pagina == "ℹ️ Sobre o Projeto":
                 st.markdown(f"- {f}")
 
     st.subheader("Referências")
-    st.markdown(
-        "- Ke et al. (2017). LightGBM. NeurIPS.
-"
-        "- Lundberg & Lee (2017). SHAP. NeurIPS.
-"
-        "- Akiba et al. (2019). Optuna. KDD.
-"
-        "- Siddiqi (2012). Credit Risk Scorecards. Wiley."
-    )
+    st.markdown("""
+    - Ke et al. (2017). LightGBM. NeurIPS.
+    - Lundberg & Lee (2017). SHAP. NeurIPS.
+    - Akiba et al. (2019). Optuna. KDD.
+    - Siddiqi (2012). Credit Risk Scorecards. Wiley.
+""")
