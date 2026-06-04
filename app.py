@@ -6,7 +6,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.externals import joblib
+import sklearn.externals.joblib as joblib
 import shap
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
