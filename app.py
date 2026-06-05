@@ -249,18 +249,17 @@ if pagina == "💳 Previsão Individual":
             st.subheader("🏢 Perfil do Cliente")
             porte       = st.selectbox(
                 "Porte", ["Grande", "Medio", "Pequeno",
-                          "DESCONHECIDO"])
+                          "Desconhecido"])
             segmento    = st.selectbox(
                 "Segmento Industrial",
-                ["Serviços", "Indústria", "Comércio",
-                 "PESSOA_FISICA", "DESCONHECIDO"])
+                ["Serviços", "Indústria", "Comércio"])
             tipo_pessoa = st.selectbox(
                 "Tipo de Pessoa",
                 ["Pessoa Jurídica", "Pessoa Física"])
             email       = st.selectbox(
                 "Domínio do Email",
                 ["Gmail", "Hotmail", "Yahoo", "Outlook",
-                 "Aol", "Bol", "DESCONHECIDO"])
+                 "Aol", "Bol"])
             data_cadastro = st.date_input(
                 "Data de Cadastro", value=date(2020, 1, 1))
 
@@ -500,13 +499,16 @@ elif pagina == "ℹ️ Sobre o Projeto":
 
     st.subheader("Contexto")
     st.markdown(
-        "Case técnico desenvolvido para a posição de **Cientista "
-        "de Dados Júnior na Datarisk**, empresa de consultoria "
-        "especializada em soluções de dados e inteligência de "
-        "crédito. O objetivo foi construir um modelo preditivo "
-        "capaz de estimar a **probabilidade de inadimplência** "
-        "de cobranças mensais — identificando com antecedência "
-        "quais clientes têm maior risco de não pagar no prazo.")
+         "Este projeto simula um sistema de inteligência de crédito "
+         "para uma instituição financeira fictícia. O desafio consiste "
+         "em identificar, com antecedência, quais clientes têm maior "
+         "probabilidade de não pagar uma cobrança mensal no prazo — "
+         "permitindo que a equipe de cobrança aja de forma proativa "
+         "antes que a inadimplência se concretize. "
+         "A solução foi construída sobre um histórico real de transações "
+         "financeiras, combinando análise exploratória aprofundada, "
+         "engenharia de features comportamentais e um modelo preditivo "
+         "calibrado para gerar probabilidades confiáveis entre 0 e 1.")
 
     st.subheader("Definição de Inadimplência")
     st.info("Pagamento realizado com **5 ou mais dias de atraso** "
